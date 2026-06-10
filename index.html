@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAQSADGACHA — Aqlli Ta'lim Platformasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:linear-gradient(145deg,#c8dff5 0%,#d8eaf8 30%,#e4f0fb 60%,#cce0f5 100%);
+  --glass:rgba(255,255,255,0.5);
+  --glass2:rgba(255,255,255,0.7);
+  --border:rgba(255,255,255,0.65);
+  --border2:rgba(160,200,255,0.35);
+  --blue:#2a5cb0;
+  --blue2:#4a9eff;
+  --cyan:#00c8e8;
+  --purple:#8050d0;
+  --text:#0f2050;
+  --text2:rgba(20,50,120,0.65);
+  --text3:rgba(30,60,140,0.4);
+  --shadow:0 8px 32px rgba(80,130,220,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+/* AMBIENT */
+.amb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px)}
+.a1{width:500px;height:500px;top:-150px;right:-100px;background:rgba(160,190,255,0.3)}
+.a2{width:400px;height:400px;bottom:-100px;left:-80px;background:rgba(140,210,255,0.25)}
+.a3{width:300px;height:300px;top:40%;left:40%;background:rgba(180,150,255,0.15)}
+
+/* NAVBAR */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 5%;
+  background:rgba(255,255,255,0.35);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Orbitron',sans-serif;
+  font-size:17px;font-weight:900;
+  background:linear-gradient(135deg,#2a5cb0,#4a9eff,#8050d0);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:2px;
+  filter:drop-shadow(0 0 12px rgba(74,158,255,0.4));
+}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{
+  font-size:13px;color:var(--text2);font-weight:500;text-decoration:none;
+  transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--blue)}
+.nav-btn{
+  padding:8px 22px;border-radius:22px;
+  background:linear-gradient(135deg,#2a5cb0,#4a80d4);
+  color:#fff;font-size:13px;font-weight:600;
+  border:none;cursor:pointer;font-family:'DM Sans',sans-serif;
+  box-shadow:0 4px 16px rgba(42,92,176,0.3);
+  transition:all 0.2s;text-decoration:none;
+}
+.nav-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(42,92,176,0.4)}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:100px 5% 60px;
+  position:relative;z-index:1;
+}
+.hero-inner{
+  max-width:1100px;width:100%;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:60px;align-items:center;
+}
+.hero-left{opacity:0;animation:slideRight 0.8s ease 0.2s forwards}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:6px 16px;border-radius:20px;
+  background:rgba(74,158,255,0.1);
+  border:1px solid rgba(74,158,255,0.25);
+  font-size:12px;font-weight:500;color:var(--blue2);
+  margin-bottom:20px;
+}
+.hero-tag-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:blink 2s ease-in-out infinite}
+.hero-h1{
+  font-family:'Orbitron',sans-serif;
+  font-size:56px;font-weight:900;
+  background:linear-gradient(135deg,#1a3a80 0%,#2a6ab0 40%,#4a9eff 70%,#8050d0 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1.05;letter-spacing:2px;
+  filter:drop-shadow(0 0 20px rgba(74,158,255,0.3));
+  margin-bottom:6px;
+}
+.hero-h1 span{display:block;font-size:26px;letter-spacing:6px;opacity:0.7}
+.hero-sub{
+  font-size:17px;color:var(--text2);line-height:1.7;
+  margin:16px 0 32px;font-weight:300;max-width:440px;
+}
+.hero-sub em{color:var(--blue);font-style:normal;font-weight:500}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-main{
+  padding:13px 32px;border-radius:14px;
+  background:linear-gradient(135deg,#2a5cb0,#4a80d4);
+  color:#fff;font-size:14px;font-weight:600;
+  border:none;cursor:pointer;font-family:'DM Sans',sans-serif;
+  box-shadow:0 6px 24px rgba(42,92,176,0.35);
+  transition:all 0.25s;text-decoration:none;display:inline-block;
+}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(42,92,176,0.45)}
+.btn-ghost{
+  padding:13px 28px;border-radius:14px;
+  background:rgba(255,255,255,0.6);
+  color:var(--blue);font-size:14px;font-weight:600;
+  border:1.5px solid rgba(74,158,255,0.3);
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  backdrop-filter:blur(10px);transition:all 0.2s;text-decoration:none;display:inline-block;
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.8);border-color:var(--blue2)}
+.hero-stats{display:flex;gap:24px;margin-top:36px}
+.stat-item{text-align:center}
+.stat-num{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:700;color:var(--blue);display:block}
+.stat-lbl{font-size:11px;color:var(--text3);font-weight:400}
+
+/* ORB SIDE */
+.hero-right{
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;animation:slideLeft 0.8s ease 0.4s forwards;
+  position:relative;
+}
+.orb-container{position:relative;width:320px;height:320px}
+.big-orb{
+  width:280px;height:280px;border-radius:50%;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:radial-gradient(circle at 35% 30%,rgba(220,200,255,0.95),rgba(120,80,220,0.75) 35%,rgba(80,130,255,0.55) 60%,rgba(160,80,220,0.35) 80%,transparent);
+  border:1.5px solid rgba(160,120,255,0.4);
+  box-shadow:0 0 60px rgba(130,80,220,0.45),0 0 120px rgba(90,130,255,0.25),inset 0 0 40px rgba(200,170,255,0.15);
+  animation:orbFloat 5s ease-in-out infinite,orbGlow 3s ease-in-out infinite;
+  overflow:hidden;
+}
+.big-orb::before{
+  content:'';position:absolute;inset:0;
+  background:conic-gradient(from 0deg,transparent 0%,rgba(180,140,255,0.15) 20%,transparent 40%,rgba(100,160,255,0.1) 60%,transparent 80%,rgba(180,100,255,0.12) 100%);
+  animation:orbSpin 8s linear infinite;border-radius:50%;
+}
+.big-orb::after{content:'';position:absolute;top:22px;left:26px;width:32px;height:20px;background:rgba(255,255,255,0.55);border-radius:50%;transform:rotate(-30deg);filter:blur(4px)}
+
+/* Floating rings */
+.ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid;animation:ringOrbit linear infinite}
+.r1{width:320px;height:320px;margin:-160px 0 0 -160px;border-color:rgba(130,100,255,0.2);border-top-color:rgba(130,100,255,0.6);animation-duration:6s}
+.r2{width:360px;height:360px;margin:-180px 0 0 -180px;border-color:rgba(80,140,255,0.12);border-right-color:rgba(80,140,255,0.5);animation-duration:9s;animation-direction:reverse}
+.r3{width:290px;height:290px;margin:-145px 0 0 -145px;border-color:rgba(180,120,255,0.1);border-bottom-color:rgba(180,120,255,0.4);animation-duration:7s}
+
+/* Floating particles around orb */
+.particle{
+  position:absolute;border-radius:50%;
+  animation:particleFloat linear infinite;
+}
+.p1{width:6px;height:6px;background:rgba(100,160,255,0.8);top:20%;right:15%;animation-duration:4s;box-shadow:0 0 8px rgba(100,160,255,0.6)}
+.p2{width:4px;height:4px;background:rgba(180,120,255,0.8);bottom:25%;left:10%;animation-duration:5s;animation-delay:-2s;box-shadow:0 0 6px rgba(180,120,255,0.6)}
+.p3{width:5px;height:5px;background:rgba(0,200,230,0.8);top:60%;right:8%;animation-duration:6s;animation-delay:-1s;box-shadow:0 0 8px rgba(0,200,230,0.6)}
+.p4{width:3px;height:3px;background:rgba(255,160,100,0.7);top:15%;left:20%;animation-duration:4.5s;animation-delay:-3s}
+
+@keyframes orbFloat{0%,100%{transform:translate(-50%,-50%) translateY(0)}50%{transform:translate(-50%,-50%) translateY(-14px)}}
+@keyframes orbGlow{0%,100%{box-shadow:0 0 60px rgba(130,80,220,.45),0 0 120px rgba(90,130,255,.25)}50%{box-shadow:0 0 80px rgba(130,80,220,.65),0 0 160px rgba(90,130,255,.35)}}
+@keyframes orbSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes ringOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes particleFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-18px) scale(1.2)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* HOW IT WORKS */
+.section{padding:80px 5%;position:relative;z-index:1}
+.section-tag{
+  display:inline-block;padding:5px 16px;border-radius:20px;
+  background:rgba(74,158,255,0.1);border:1px solid rgba(74,158,255,0.2);
+  font-size:11px;font-weight:600;color:var(--blue2);letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:14px;
+}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:36px;font-weight:800;color:var(--text);
+  margin-bottom:10px;line-height:1.2;
+}
+.section-sub{font-size:15px;color:var(--text2);font-weight:300;max-width:500px;line-height:1.7}
+
+.steps-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:16px;margin-top:44px;
+}
+.step-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px 18px;
+  backdrop-filter:blur(16px);
+  box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+  transition:transform 0.25s,box-shadow 0.25s;
+  opacity:0;animation:fadeUp 0.6s ease forwards;
+}
+.step-card:nth-child(1){animation-delay:.1s}
+.step-card:nth-child(2){animation-delay:.2s}
+.step-card:nth-child(3){animation-delay:.3s}
+.step-card:nth-child(4){animation-delay:.4s}
+.step-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(80,130,220,0.2)}
+.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.9),transparent)}
+.step-num{
+  font-family:'Orbitron',sans-serif;
+  font-size:36px;font-weight:900;
+  background:linear-gradient(135deg,rgba(74,158,255,0.3),rgba(128,80,208,0.2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:12px;line-height:1;
+}
+.step-icon{font-size:28px;margin-bottom:10px;display:block}
+.step-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:7px}
+.step-desc{font-size:12.5px;color:var(--text2);line-height:1.6}
+.step-connector{
+  position:absolute;top:50%;right:-8px;
+  width:16px;height:2px;
+  background:linear-gradient(90deg,var(--blue2),transparent);
+  z-index:10;
+}
+
+/* FEATURES */
+.features-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:16px;margin-top:44px;
+}
+.feat-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:18px;padding:26px 24px;
+  backdrop-filter:blur(16px);
+  box-shadow:var(--shadow);
+  display:flex;gap:18px;align-items:flex-start;
+  transition:transform 0.25s;
+  opacity:0;animation:fadeUp 0.6s ease forwards;
+}
+.feat-card:nth-child(1){animation-delay:.1s}
+.feat-card:nth-child(2){animation-delay:.2s}
+.feat-card:nth-child(3){animation-delay:.3s}
+.feat-card:nth-child(4){animation-delay:.4s}
+.feat-card:hover{transform:translateY(-3px)}
+.feat-icon-wrap{
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  box-shadow:0 4px 12px rgba(80,130,220,0.2);
+}
+.fi-blue{background:linear-gradient(135deg,rgba(74,158,255,0.2),rgba(74,158,255,0.1));border:1px solid rgba(74,158,255,0.25)}
+.fi-purple{background:linear-gradient(135deg,rgba(128,80,208,0.2),rgba(128,80,208,0.1));border:1px solid rgba(128,80,208,0.25)}
+.fi-cyan{background:linear-gradient(135deg,rgba(0,200,230,0.2),rgba(0,200,230,0.1));border:1px solid rgba(0,200,230,0.25)}
+.fi-green{background:linear-gradient(135deg,rgba(34,197,94,0.2),rgba(34,197,94,0.1));border:1px solid rgba(34,197,94,0.25)}
+.feat-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px}
+.feat-desc{font-size:12.5px;color:var(--text2);line-height:1.6}
+
+/* COMPARISON */
+.compare-wrap{
+  margin-top:44px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+  backdrop-filter:blur(16px);
+  box-shadow:var(--shadow);
+}
+.compare-head{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;
+  background:rgba(42,92,176,0.08);
+  padding:14px 20px;
+  border-bottom:1px solid rgba(200,220,255,0.3);
+}
+.ch{font-size:11.5px;font-weight:700;color:var(--text2);text-align:center}
+.ch:first-child{text-align:left}
+.ch.ours{color:var(--blue);font-size:12px}
+.compare-row{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;
+  padding:12px 20px;
+  border-bottom:1px solid rgba(200,220,255,0.12);
+  align-items:center;
+  transition:background 0.15s;
+}
+.compare-row:last-child{border:none}
+.compare-row:hover{background:rgba(74,158,255,0.04)}
+.cr-feat{font-size:13px;font-weight:500;color:var(--text)}
+.cr-val{text-align:center;font-size:14px}
+.tick{color:#22c55e;text-shadow:0 0 8px rgba(34,197,94,0.4)}
+.cross{color:rgba(180,60,60,0.5)}
+.cr-val.ours-col{
+  background:rgba(74,158,255,0.06);
+  border-radius:8px;
+  font-weight:600;color:var(--blue);
+}
+
+/* CTA */
+.cta-section{
+  padding:80px 5%;
+  position:relative;z-index:1;
+  display:flex;justify-content:center;
+}
+.cta-card{
+  max-width:700px;width:100%;
+  background:linear-gradient(135deg,rgba(42,92,176,0.12),rgba(128,80,208,0.1));
+  border:1px solid rgba(100,150,255,0.3);
+  border-radius:24px;
+  padding:52px 48px;
+  text-align:center;
+  backdrop-filter:blur(20px);
+  box-shadow:0 16px 48px rgba(60,100,220,0.15);
+  position:relative;overflow:hidden;
+}
+.cta-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.9),transparent)}
+.cta-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--text);margin-bottom:12px;line-height:1.2}
+.cta-sub{font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:28px;font-weight:300}
+.cta-orb{
+  position:absolute;top:-40px;right:-40px;
+  width:160px;height:160px;border-radius:50%;
+  background:radial-gradient(circle,rgba(128,80,208,0.2),transparent 70%);
+  pointer-events:none;
+}
+
+/* FOOTER */
+footer{
+  position:relative;z-index:1;
+  text-align:center;
+  padding:28px 5%;
+  border-top:1px solid rgba(200,220,255,0.3);
+  background:rgba(255,255,255,0.25);
+  backdrop-filter:blur(10px);
+}
+footer p{font-size:12px;color:var(--text3)}
+footer strong{color:var(--blue);font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:1px}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="amb a1"></div>
+<div class="amb a2"></div>
+<div class="amb a3"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">MAQSADGACHA</div>
+  <div class="nav-links">
+    <a href="#how">Qanday ishlaydi?</a>
+    <a href="#features">Funksiyalar</a>
+    <a href="#compare">Farqi nima?</a>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <a href="login.html" class="nav-links" style="font-size:13px;color:var(--blue2);font-weight:500;text-decoration:none">Kirish</a>
+    <a href="login.html" class="nav-btn">Bepul Boshlash →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-tag">
+        <div class="hero-tag-dot"></div>
+        AI asosidagi ta'lim platformasi
+      </div>
+      <h1 class="hero-h1">
+        MAQSAD<span>GACHA</span>
+      </h1>
+      <p class="hero-sub">
+        Material yuklang — AI tushuntiradi, test qiladi, zaif joylarni topadi va sizi <em>maqsadga yetguncha</em> yo'naltiradi.
+      </p>
+      <div class="hero-btns">
+        <a href="login.html" class="btn-main">Bepul Boshlash →</a>
+        <a href="#how" class="btn-ghost">Qanday ishlaydi?</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-num">2x</span>
+          <span class="stat-lbl">Tezroq o'rganish</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">AI</span>
+          <span class="stat-lbl">Shaxsiy ustoz</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">100%</span>
+          <span class="stat-lbl">Bepul boshlash</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="orb-container">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <div class="big-orb"></div>
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
+        <div class="particle p4"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="reveal">
+      <div class="section-tag">Jarayon</div>
+      <div class="section-title">Qanday ishlaydi?</div>
+      <div class="section-sub">7 ta oddiy qadam bilan bilimingizni mustahkamlang</div>
+    </div>
+    <div class="steps-grid reveal">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <span class="step-icon">📄</span>
+        <div class="step-title">Material yuklash</div>
+        <div class="step-desc">PDF, slayd yoki matn shaklida o'z materialingizni yuklang</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <span class="step-icon">🧠</span>
+        <div class="step-title">AI tushuntiradi</div>
+        <div class="step-desc">Mavzu bosqichma-bosqich, oddiy va tushunarli tilda ochib beriladi</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <span class="step-icon">✅</span>
+        <div class="step-title">Test va savol</div>
+        <div class="step-desc">Bilimingizni tekshirish uchun aqlli savollar beriladi</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <span class="step-icon">🎯</span>
+        <div class="step-title">Maqsadga yet</div>
+        <div class="step-desc">Zaif joylar tahlil qilinib, keyingi o'qish rejasi beriladi</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features" style="padding-top:20px">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="reveal">
+      <div class="section-tag">Funksiyalar</div>
+      <div class="section-title">Hammasi bir joyda</div>
+      <div class="section-sub">Shaxsiy ustoz, test platforma va o'qish rejasi — bitta ilovada</div>
+    </div>
+    <div class="features-grid reveal">
+      <div class="feat-card">
+        <div class="feat-icon-wrap fi-blue">📚</div>
+        <div>
+          <div class="feat-title">Smart Learning</div>
+          <div class="feat-desc">Slayd va PDF dan o'rgatadi. AI savol-javob sessiyasi. Mavzuni to'liq tushunguncha ketmaydi.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-wrap fi-purple">🎓</div>
+        <div>
+          <div class="feat-title">Imtihon Simulyatsiyasi</div>
+          <div class="feat-desc">Real imtihon sharoitini yaratadi. Vaqt, bosim, va haqiqiy savollar bilan tayyorlanasiz.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-wrap fi-cyan">📅</div>
+        <div>
+          <div class="feat-title">Shaxsiy O'qish Rejasi</div>
+          <div class="feat-desc">Qachon, nimani, qancha vaqt o'qish kerakligini AI aniqlab, kunlik reja tuzib beradi.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon-wrap fi-green">📊</div>
+        <div>
+          <div class="feat-title">Progress Tahlili</div>
+          <div class="feat-desc">Kuchli va zaif tomonlaringiz, o'sish grafiklaringiz va maqsadga qancha qolganingiz.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="section" id="compare" style="padding-top:20px">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="reveal">
+      <div class="section-tag">Taqqoslash</div>
+      <div class="section-title">Nima uchun MAQSADGACHA?</div>
+      <div class="section-sub">Boshqa platformalardan farqi — sizning materialingiz bilan ishlaydi</div>
+    </div>
+    <div class="compare-wrap reveal">
+      <div class="compare-head">
+        <div class="ch">Imkoniyat</div>
+        <div class="ch">Duolingo</div>
+        <div class="ch">Coursera</div>
+        <div class="ch">Quizlet</div>
+        <div class="ch ours">MAQSADGACHA ✦</div>
+      </div>
+      <div class="compare-row">
+        <div class="cr-feat">O'z materialingiz bilan ishlaydi</div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val ours-col"><span class="tick">✓</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="cr-feat">AI savol-javob sessiyasi</div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val ours-col"><span class="tick">✓</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="cr-feat">Shaxsiy kunlik reja</div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val ours-col"><span class="tick">✓</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="cr-feat">Zaif joylarni topadi</div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="tick">✓</span></div>
+        <div class="cr-val ours-col"><span class="tick">✓</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="cr-feat">Imtihon simulyatsiyasi</div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val"><span class="cross">✗</span></div>
+        <div class="cr-val ours-col"><span class="tick">✓</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-card reveal">
+    <div class="cta-orb"></div>
+    <div class="section-tag" style="margin-bottom:16px">Bepul boshlang</div>
+    <div class="cta-title">Maqsadingizga<br>biz bilan yeting</div>
+    <p class="cta-sub">Bugun boshlang — birinchi materialingizni yuklang va AI sizni maqsadgacha olib boradi.</p>
+    <a href="login.html" class="btn-main" style="font-size:15px;padding:14px 40px">Hoziroq Boshlash →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <strong>MAQSADGACHA</strong> — Barcha huquqlar himoyalangan</p>
+  <p style="margin-top:6px">Boshladingmi — maqsadgacha olib boramiz.</p>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible')}
+  })
+},{threshold:0.1})
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el))
+</script>
+</body>
+</html>
