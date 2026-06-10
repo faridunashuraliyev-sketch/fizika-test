@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bilim Markazi — AI o'qituvchi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --surface2: #f0efeb;
+    --border: #e2e0d8; --border2: #ccc9be;
+    --text: #1a1a18; --text2: #6b6b65; --text3: #9b9b94;
+    --blue: #1a56db; --blue-bg: #eff5ff; --blue-border: #a4cafe;
+    --green: #057a55; --green-bg: #f3faf7; --green-border: #84e1bc;
+    --red: #c81e1e; --red-bg: #fdf2f2; --red-border: #f8b4b4;
+    --purple: #7c3aed; --purple-bg: #f5f3ff; --purple-border: #c4b5fd;
+    --amber-bg: #fffbeb; --amber-border: #fcd34d; --amber: #92400e;
+    --radius: 10px; --radius-lg: 14px;
+  }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+  .page { max-width: 720px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 2.5rem; }
+  .logo-icon { width: 38px; height: 38px; border-radius: 9px; background: var(--text); display: flex; align-items: center; justify-content: center; }
+  .logo-icon svg { width: 21px; height: 21px; fill: none; stroke: white; stroke-width: 2; }
+  .logo-text { font-size: 15px; font-weight: 600; }
+  .logo-sub { font-size: 12px; color: var(--text3); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .screen-heading { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 0.4rem; }
+  .screen-sub { font-size: 14px; color: var(--text2); margin-bottom: 1.75rem; }
+  .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; }
+  .setup-card label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text2); }
+  .setup-card input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; color: var(--text); outline: none; font-family: monospace; }
+  .setup-card input:focus { border-color: var(--blue); }
+  .setup-hint { font-size: 12px; color: var(--text3); margin-top: 8px; line-height: 1.6; }
+  .setup-hint a { color: var(--blue); text-decoration: none; }
+  .free-badge { display: inline-block; background: #dcfce7; color: #166534; border: 1px solid #86efac; border-radius: 100px; font-size: 11px; font-weight: 600; padding: 2px 10px; margin-left: 6px; }
+  .drop-zone { border: 2px dashed var(--border2); border-radius: var(--radius-lg); padding: 2.25rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface); margin-bottom: 1rem; }
+  .drop-zone:hover, .drop-zone.drag { border-color: var(--blue); background: var(--blue-bg); }
+  .drop-zone svg { width: 36px; height: 36px; stroke: var(--text3); margin: 0 auto 0.75rem; display: block; fill: none; stroke-width: 1.5; }
+  .drop-zone p { font-size: 14px; color: var(--text2); }
+  .drop-zone strong { color: var(--text); }
+  #file-input { display: none; }
+  .topic-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
+  .topic-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .topic-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .topic-top svg { width: 20px; height: 20px; stroke: var(--blue); fill: none; stroke-width: 1.5; flex-shrink: 0; }
+  .topic-top .tname { flex: 1; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topic-top .ftype { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px; background: var(--surface2); color: var(--text2); }
+  .topic-top .rm { border: none; background: none; cursor: pointer; color: var(--text3); padding: 2px; display: flex; }
+  .topic-top .rm:hover { color: var(--red); }
+  .topic-actions { display: flex; gap: 8px; }
+  .topic-actions .btn { flex: 1; padding: 9px 12px; font-size: 13px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.15s; font-family: inherit; }
+  .btn:hover { background: var(--surface2); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn.primary { background: var(--text); color: white; border-color: var(--text); }
+  .btn.primary:hover { opacity: 0.85; }
+  .btn.learn { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-border); }
+  .btn.learn:hover { background: #ede9fe; }
+  .btn.test { background: var(--blue-bg); color: var(--blue); border-color: var(--blue-border); }
+  .btn.test:hover { background: #dbeafe; }
+  .btn.full { width: 100%; }
+  .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+  .loading-wrap { text-align: center; padding: 4rem 1rem; }
+  .spinner { width: 44px; height: 44px; margin: 0 auto 1.5rem; border: 3px solid var(--border); border-top-color: var(--text); border-radius: 50%; animation: spin 0.75s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-title { font-size: 18px; font-weight: 600; margin-bottom: 0.4rem; }
+  .loading-msg { font-size: 14px; color: var(--text2); }
+  .back-row { margin-bottom: 1.25rem; }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); background: none; border: none; cursor: pointer; padding: 4px 0; font-family: inherit; }
+  .back-btn:hover { color: var(--text); }
+  .back-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
+  /* Lesson */
+  .lesson-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+  .lesson-intro { font-size: 14px; color: var(--text2); margin-bottom: 1.5rem; line-height: 1.7; }
+  .lesson-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.4rem 1.5rem; margin-bottom: 12px; }
+  .lesson-section h3 { font-size: 16px; font-weight: 600; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 8px; }
+  .sec-num { width: 24px; height: 24px; border-radius: 50%; background: var(--purple-bg); color: var(--purple); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .lesson-section p { font-size: 14px; line-height: 1.75; color: var(--text); white-space: pre-wrap; }
+  .formula-box { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius); padding: 10px 14px; margin: 10px 0; font-family: 'Cambria Math', Georgia, serif; font-size: 15px; color: var(--amber); }
+  .example-box { background: var(--green-bg); border-left: 3px solid var(--green); border-radius: var(--radius); padding: 10px 14px; margin-top: 10px; font-size: 13px; color: #065f46; line-height: 1.7; white-space: pre-wrap; }
+  .example-box strong { display: block; margin-bottom: 4px; }
+  .keypoints { background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin: 1rem 0; }
+  .keypoints h3 { font-size: 15px; font-weight: 600; color: var(--blue); margin-bottom: 0.6rem; }
+  .keypoints ul { list-style: none; }
+  .keypoints li { font-size: 13.5px; line-height: 1.7; padding-left: 22px; position: relative; margin-bottom: 6px; color: #1e3a8a; }
+  .keypoints li::before { content: "✓"; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+  .lesson-cta { margin-top: 1.5rem; }
+  /* Test */
+  .test-header { margin-bottom: 1.5rem; }
+  .test-topic { font-size: 12px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .test-title { font-size: 20px; font-weight: 700; }
+  .test-meta { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .progress-wrap { margin-bottom: 1.5rem; }
+  .progress-track { height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; margin-bottom: 8px; }
+  .progress-fill { height: 100%; background: var(--text); border-radius: 100px; transition: width 0.4s ease; }
+  .progress-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+  .dot.ok { background: var(--green); }
+  .dot.err { background: var(--red); }
+  .dot.cur { background: var(--text); }
+  .question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; }
+  .question-num { font-size: 12px; color: var(--text3); margin-bottom: 0.5rem; }
+  .question-text { font-size: 16px; line-height: 1.65; }
+  .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .opt-btn { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; color: var(--text); cursor: pointer; text-align: left; transition: all 0.15s; width: 100%; font-family: inherit; }
+  .opt-btn:hover:not(:disabled) { border-color: var(--border2); background: var(--surface2); }
+  .opt-btn .letter { width: 30px; height: 30px; border-radius: 50%; background: var(--surface2); color: var(--text2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+  .opt-btn.correct { border-color: var(--green); border-width: 1.5px; background: var(--green-bg); }
+  .opt-btn.correct .letter { background: var(--green-border); color: var(--green); }
+  .opt-btn.wrong { border-color: var(--red); border-width: 1.5px; background: var(--red-bg); }
+  .opt-btn.wrong .letter { background: var(--red-border); color: var(--red); }
+  .opt-btn:disabled { cursor: default; }
+  .exp-box { padding: 12px 16px; border-radius: var(--radius); font-size: 13px; line-height: 1.65; margin-bottom: 1rem; display: none; border-left: 3px solid transparent; }
+  .exp-box.correct { background: var(--green-bg); border-color: var(--green); color: #065f46; }
+  .exp-box.wrong { background: var(--red-bg); border-color: var(--red); color: #991b1b; }
+  .nav-row { display: flex; gap: 10px; }
+  .nav-row .btn { flex: 1; }
+  /* Results */
+  .result-hero { text-align: center; padding: 2rem 0 1.5rem; }
+  .score-ring { width: 110px; height: 110px; margin: 0 auto 1.25rem; position: relative; }
+  .score-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+  .ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+  .score-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-num { font-size: 30px; font-weight: 700; }
+  .score-denom { font-size: 13px; color: var(--text3); }
+  .result-grade { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .result-pct { font-size: 14px; color: var(--text2); }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem; text-align: center; }
+  .stat-box .sv { font-size: 24px; font-weight: 700; }
+  .stat-box .sl { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .stat-box.green .sv { color: var(--green); }
+  .stat-box.red .sv { color: var(--red); }
+  .review-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 0.75rem; }
+  .review-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
+  .rv-item { padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; }
+  .rv-item.rv-ok { border-color: var(--green-border); background: var(--green-bg); }
+  .rv-item.rv-err { border-color: var(--red-border); background: var(--red-bg); }
+  .rv-q { font-weight: 500; margin-bottom: 5px; line-height: 1.5; }
+  .rv-ans { margin-bottom: 4px; }
+  .rv-ok .rv-ans { color: var(--green); }
+  .rv-err .rv-ans { color: var(--red); }
+  .rv-exp { color: var(--text2); font-size: 12px; line-height: 1.5; margin-top: 4px; }
+  .rv-err .rv-exp { color: #991b1b; }
+  .action-row { display: flex; gap: 10px; }
+  .action-row .btn { flex: 1; }
+  .weak-box { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius-lg); padding: 1.1rem 1.3rem; margin-bottom: 1.25rem; }
+  .weak-box h4 { font-size: 14px; color: var(--amber); margin-bottom: 6px; }
+  .weak-box p { font-size: 13px; color: var(--amber); line-height: 1.6; }
+  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 10px 20px; border-radius: 100px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; max-width: 90vw; z-index: 999; }
+  .toast.show { opacity: 1; }
+  @media (max-width: 520px) { .page { padding: 1.25rem 1rem 3rem; } .screen-heading { font-size: 22px; } .action-row { flex-direction: column; } .topic-actions { flex-direction: column; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="logo-row">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div>
+      <div class="logo-text">Bilim Markazi</div>
+      <div class="logo-sub">AI o'qituvchi — o'rgan va test ishla</div>
+    </div>
+  </div>
+
+  <!-- SETUP -->
+  <div id="setup-screen" class="screen active">
+    <h1 class="screen-heading">Boshlash uchun<br>API kalit kiriting</h1>
+    <p class="screen-sub">Google Gemini API — bepul, hamma uchun ishlaydi.</p>
+    <div class="setup-card">
+      <label>Google Gemini API kaliti <span class="free-badge">BEPUL</span></label>
+      <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off" />
+      <p class="setup-hint">Kalit yo'qmi? <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> dan bepul oling!</p>
+    </div>
+    <button class="btn primary full" onclick="saveApiKey()">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Saqlash va davom etish
+    </button>
+  </div>
+
+  <!-- UPLOAD / HOME -->
+  <div id="upload-screen" class="screen">
+    <h1 class="screen-heading">Mavzularingizni yuklang</h1>
+    <p class="screen-sub">PDF yoki PPTX yuklang — AI mavzuni o'rgatadi va test oladi.</p>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><polyline points="9 15 12 12 15 15"/></svg>
+      <p><strong>PDF yoki PPTX tanlash</strong></p>
+      <p style="margin-top:4px;">yoki shu yerga tashlang &nbsp;·&nbsp; max 15 ta</p>
+    </div>
+    <input type="file" id="file-input" accept=".pdf,.pptx" multiple />
+    <div class="topic-list" id="topic-list"></div>
+    <div style="margin-top:10px;text-align:center;">
+      <button class="btn" style="font-size:12px;padding:6px 14px;color:var(--text3);" onclick="changeKey()">API kalitni o'zgartirish</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading-screen" class="screen">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <p class="loading-title" id="loading-title">AI ishlamoqda...</p>
+      <p class="loading-msg" id="loading-msg">Iltimos kuting</p>
+    </div>
+  </div>
+
+  <!-- LESSON -->
+  <div id="lesson-screen" class="screen">
+    <div class="back-row">
+      <button class="back-btn" onclick="goHome()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Mavzularga qaytish</button>
+    </div>
+    <h1 class="lesson-title" id="lesson-title">—</h1>
+    <p class="lesson-intro" id="lesson-intro"></p>
+    <div id="lesson-sections"></div>
+    <div class="keypoints" id="keypoints-box" style="display:none;">
+      <h3>Eng muhim nuqtalar</h3>
+      <ul id="keypoints-list"></ul>
+    </div>
+    <div class="lesson-cta">
+      <button class="btn primary full" onclick="startTestFromLesson()">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Endi test ishlash — 25 savol
+      </button>
+    </div>
+  </div>
+
+  <!-- TEST -->
+  <div id="test-screen" class="screen">
+    <div class="back-row">
+      <button class="back-btn" onclick="goHome()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Mavzularga qaytish</button>
+    </div>
+    <div class="test-header">
+      <p class="test-topic">TEST</p>
+      <h2 class="test-title" id="test-title">—</h2>
+      <p class="test-meta">Savol <strong id="q-cur">1</strong> / <strong id="q-tot">25</strong></p>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:4%"></div></div>
+      <div class="progress-dots" id="prog-dots"></div>
+    </div>
+    <div class="question-card">
+      <p class="question-num" id="q-num">1-savol</p>
+      <p class="question-text" id="q-text">Yuklanmoqda...</p>
+    </div>
+    <div class="options" id="opts"></div>
+    <div class="exp-box" id="exp-box"></div>
+    <div class="nav-row">
+      <button class="btn" id="prev-btn" onclick="prevQ()" disabled><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Oldingi</button>
+      <button class="btn" id="next-btn" disabled>Keyingi<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="result-screen" class="screen">
+    <div class="result-hero">
+      <div class="score-ring">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle class="ring-bg" cx="55" cy="55" r="46"/>
+          <circle class="ring-fill" id="ring-fill" cx="55" cy="55" r="46" stroke="#1a1a18" stroke-dasharray="289" stroke-dashoffset="289"/>
+        </svg>
+        <div class="score-inner">
+          <span class="score-num" id="res-score">0</span>
+          <span class="score-denom" id="res-denom">/ 25</span>
+        </div>
+      </div>
+      <p class="result-grade" id="res-grade">—</p>
+      <p class="result-pct" id="res-pct">—</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box green"><div class="sv" id="st-correct">0</div><div class="sl">to'g'ri</div></div>
+      <div class="stat-box red"><div class="sv" id="st-wrong">0</div><div class="sl">xato</div></div>
+      <div class="stat-box"><div class="sv" id="st-pct">0%</div><div class="sl">ball</div></div>
+    </div>
+    <div class="weak-box" id="weak-box" style="display:none;">
+      <h4>⚠ Zaif joylaringiz</h4>
+      <p id="weak-text"></p>
+    </div>
+    <div class="review-section">
+      <h3>Xato va to'g'ri javoblar tahlili</h3>
+      <div class="review-list" id="rev-list"></div>
+    </div>
+    <div class="action-row">
+      <button class="btn" onclick="retake()"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Qayta ishlash</button>
+      <button class="btn learn" onclick="relearn()"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Qayta o'rganish</button>
+      <button class="btn" onclick="goHome()"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Mavzular</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var apiKey = localStorage.getItem('bilim_gemini_key') || '';
+var topics = []; // {name, type:'pdf'|'pptx', b64 (pdf) or text (pptx), lesson, questions}
+var curTopic = -1;
+var questions = [];
+var answers = [];
+var curQ = 0;
+
+window.onload = function() {
+  if (apiKey) show('upload-screen'); else show('setup-screen');
+  setupDrop();
+};
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function goHome() { show('upload-screen'); }
+
+function saveApiKey() {
+  var val = document.getElementById('api-key-input').value.trim();
+  if (!val || val.length < 10) { toast("Kalit noto'g'ri"); return; }
+  apiKey = val;
+  localStorage.setItem('bilim_gemini_key', apiKey);
+  show('upload-screen');
+}
+function changeKey() {
+  apiKey = ''; localStorage.removeItem('bilim_gemini_key');
+  document.getElementById('api-key-input').value = '';
+  show('setup-screen');
+}
+
+function setupDrop() {
+  var dz = document.getElementById('drop-zone');
+  var fi = document.getElementById('file-input');
+  dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', function(){ dz.classList.remove('drag'); });
+  dz.addEventListener('drop', function(e){
+    e.preventDefault(); dz.classList.remove('drag');
+    handleFiles(Array.from(e.dataTransfer.files));
+  });
+  fi.addEventListener('change', function(){ handleFiles(Array.from(fi.files)); fi.value=''; });
+}
+
+async function handleFiles(fs) {
+  for (var i = 0; i < fs.length; i++) {
+    var f = fs[i];
+    if (topics.length >= 15) break;
+    if (topics.find(function(t){ return t.name === f.name; })) continue;
+    var ext = f.name.split('.').pop().toLowerCase();
+    if (ext === 'pdf') {
+      var b64 = await fileToB64(f);
+      topics.push({ name: f.name.replace(/\.pdf$/i,''), type: 'pdf', b64: b64, lesson: null, questions: null });
+    } else if (ext === 'pptx') {
+      try {
+        var text = await extractPptx(f);
+        topics.push({ name: f.name.replace(/\.pptx$/i,''), type: 'pptx', text: text, lesson: null, questions: null });
+      } catch(e) { toast('PPTX o\'qishda xato: ' + f.name); }
+    }
+  }
+  renderTopics();
+}
+
+function fileToB64(file) {
+  return new Promise(function(res, rej){
+    var r = new FileReader();
+    r.onload = function(){ res(r.result.split(',')[1]); };
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function extractPptx(file) {
+  var zip = await JSZip.loadAsync(file);
+  var slideFiles = Object.keys(zip.files).filter(function(n){ return /^ppt\/slides\/slide\d+\.xml$/.test(n); });
+  slideFiles.sort(function(a,b){
+    return parseInt(a.match(/\d+/)[0]) - parseInt(b.match(/\d+/)[0]);
+  });
+  var allText = [];
+  for (var i = 0; i < slideFiles.length; i++) {
+    var xml = await zip.files[slideFiles[i]].async('string');
+    var matches = xml.match(/<a:t>([^<]*)<\/a:t>/g) || [];
+    var slideText = matches.map(function(m){ return m.replace(/<\/?a:t>/g,''); }).join(' ');
+    if (slideText.trim()) allText.push((i+1) + '-slayd: ' + slideText);
+  }
+  return allText.join('\n\n');
+}
+
+function removeTopic(i) { topics.splice(i,1); renderTopics(); }
+
+function renderTopics() {
+  var list = document.getElementById('topic-list');
+  list.innerHTML = '';
+  topics.forEach(function(t, i){
+    var el = document.createElement('div');
+    el.className = 'topic-card';
+    el.innerHTML =
+      '<div class="topic-top">' +
+        '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+        '<span class="tname">' + t.name + '</span>' +
+        '<span class="ftype">' + t.type.toUpperCase() + '</span>' +
+        '<button class="rm" onclick="removeTopic(' + i + ')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+      '</div>' +
+      '<div class="topic-actions">' +
+        '<button class="btn learn" onclick="learnTopic(' + i + ')"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>O\'rganish</button>' +
+        '<button class="btn test" onclick="testTopic(' + i + ')"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Test ishlash</button>' +
+      '</div>';
+    list.appendChild(el);
+  });
+}
+
+function buildContentParts(t, promptText) {
+  var parts = [];
+  if (t.type === 'pdf') {
+    parts.push({ inline_data: { mime_type: 'application/pdf', data: t.b64 } });
+    parts.push({ text: promptText });
+  } else {
+    parts.push({ text: 'MAVZU MATNI (PPTX slaydlardan):\n\n' + t.text + '\n\n---\n\n' + promptText });
+  }
+  return parts;
+}
+
+async function callGemini(parts, maxTokens) {
+  var resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: parts }],
+      generationConfig: { maxOutputTokens: maxTokens || 8000, temperature: 0.3 }
+    })
+  });
+  var data = await resp.json();
+  if (data.error) throw new Error(data.error.message);
+  var raw = data.candidates[0].content.parts.map(function(p){ return p.text || ''; }).join('');
+  return raw.replace(/```json|```/g, '').trim();
+}
+
+/* ─── LEARN MODE ─── */
+async function learnTopic(i) {
+  curTopic = i;
+  var t = topics[i];
+  if (t.lesson) { renderLesson(t.lesson); show('lesson-screen'); return; }
+
+  show('loading-screen');
+  document.getElementById('loading-title').textContent = 'AI darsni tayyorlamoqda...';
+  document.getElementById('loading-msg').textContent = t.name;
+
+  try {
+    var prompt = "Siz O'zbek tilida dars beruvchi tajribali fizika o'qituvchisisiz. Berilgan materialni o'qib, talaba TEZ va OSON tushunadigan qilib dars tayyorlang.\n\nTALABLAR:\n- Sodda, tushunarli til ishlatilsin (talaba birinchi marta ko'rayotgandek tushuntiring)\n- Murakkab tushunchalarni hayotiy misollar bilan izohlang\n- Formulalarni alohida ko'rsating va har bir belgini izohlang\n- 4-7 ta bo'limga ajrating\n- Har bo'limda amaliy misol bo'lsin\n\nFaqat sof JSON qaytaring:\n{\"title\":\"mavzu nomi\",\"intro\":\"qisqa kirish (2-3 jumla, nima o'rganamiz)\",\"sections\":[{\"heading\":\"bo'lim nomi\",\"content\":\"batafsil tushuntirish sodda tilda\",\"formula\":\"formula bo'lsa (yo'q bo'lsa bo'sh qator)\",\"example\":\"hayotiy yoki hisobiy misol\"}],\"keypoints\":[\"eng muhim 5-7 ta xulosa\"]}";
+
+    var clean = await callGemini(buildContentParts(t, prompt), 8000);
+    var lesson = JSON.parse(clean);
+    t.lesson = lesson;
+    renderLesson(lesson);
+    show('lesson-screen');
+  } catch(err) {
+    console.error(err);
+    show('upload-screen');
+    toast('Xatolik: ' + err.message);
+  }
+}
+
+function renderLesson(lesson) {
+  document.getElementById('lesson-title').textContent = lesson.title;
+  document.getElementById('lesson-intro').textContent = lesson.intro || '';
+  var wrap = document.getElementById('lesson-sections');
+  wrap.innerHTML = '';
+  (lesson.sections || []).forEach(function(s, i){
+    var div = document.createElement('div');
+    div.className = 'lesson-section';
+    var html = '<h3><span class="sec-num">' + (i+1) + '</span>' + s.heading + '</h3><p>' + s.content + '</p>';
+    if (s.formula && s.formula.trim()) html += '<div class="formula-box">' + s.formula + '</div>';
+    if (s.example && s.example.trim()) html += '<div class="example-box"><strong>Misol:</strong>' + s.example + '</div>';
+    div.innerHTML = html;
+    wrap.appendChild(div);
+  });
+  var kp = document.getElementById('keypoints-box');
+  var kpList = document.getElementById('keypoints-list');
+  kpList.innerHTML = '';
+  if (lesson.keypoints && lesson.keypoints.length) {
+    lesson.keypoints.forEach(function(k){
+      var li = document.createElement('li');
+      li.textContent = k;
+      kpList.appendChild(li);
+    });
+    kp.style.display = 'block';
+  } else kp.style.display = 'none';
+}
+
+function startTestFromLesson() { testTopic(curTopic); }
+function relearn() { learnTopic(curTopic); }
+
+/* ─── TEST MODE ─── */
+async function testTopic(i) {
+  curTopic = i;
+  var t = topics[i];
+  if (t.questions) {
+    questions = t.questions;
+    answers = new Array(questions.length).fill(null);
+    curQ = 0;
+    startTestUI(t.name);
+    return;
+  }
+
+  show('loading-screen');
+  document.getElementById('loading-title').textContent = 'AI test tuzmoqda...';
+  document.getElementById('loading-msg').textContent = '25 ta savol — ' + t.name;
+
+  try {
+    var prompt = "Siz O'zbek tilidagi fizika fani bo'yicha test tuzuvchi mutaxassississiz.\n\nBerilgan materialni diqqat bilan o'qing va undan aniq 25 ta test savol tuzing.\n\nTALABLAR:\n- Barcha savollar material mazmuniga asoslangan bo'lsin\n- Har bir savol 4 ta variant (A, B, C, D)\n- Faqat bitta to'g'ri javob\n- Qiyinlik: 8 oson, 10 o'rta, 7 qiyin\n- Formulali va hisobli savollar ham bo'lsin\n- O'zbek tilida\n- Tushuntirish batafsil: nega to'g'ri, nega boshqalari xato\n\nFaqat sof JSON:\n{\"topic\":\"mavzu nomi\",\"questions\":[{\"q\":\"savol\",\"options\":[\"A) ...\",\"B) ...\",\"C) ...\",\"D) ...\"],\"answer\":0,\"explanation\":\"tushuntirish\"}]}\nanswer: 0=A, 1=B, 2=C, 3=D";
+
+    var clean = await callGemini(buildContentParts(t, prompt), 8000);
+    var parsed = JSON.parse(clean);
+    t.questions = parsed.questions.slice(0, 25);
+    questions = t.questions;
+    answers = new Array(questions.length).fill(null);
+    curQ = 0;
+    startTestUI(parsed.topic || t.name);
+  } catch(err) {
+    console.error(err);
+    show('upload-screen');
+    toast('Xatolik: ' + err.message);
+  }
+}
+
+function startTestUI(title) {
+  buildDots(); renderQ();
+  document.getElementById('test-title').textContent = title;
+  document.getElementById('q-tot').textContent = questions.length;
+  show('test-screen');
+}
+
+function buildDots() {
+  var wrap = document.getElementById('prog-dots');
+  wrap.innerHTML = '';
+  questions.forEach(function(_, i){
+    var d = document.createElement('div');
+    d.className = 'dot'; d.id = 'dot-' + i;
+    wrap.appendChild(d);
+  });
+}
+function updateDots() {
+  questions.forEach(function(q, i){
+    var d = document.getElementById('dot-' + i);
+    if (!d) return;
+    if (i === curQ) d.className = 'dot cur';
+    else if (answers[i] === null) d.className = 'dot';
+    else if (answers[i] === q.answer) d.className = 'dot ok';
+    else d.className = 'dot err';
+  });
+}
+
+function renderQ() {
+  var q = questions[curQ];
+  var ua = answers[curQ];
+  var total = questions.length;
+  var L = ['A','B','C','D'];
+  document.getElementById('q-num').textContent = (curQ+1) + '-savol';
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-cur').textContent = curQ+1;
+  document.getElementById('prog-fill').style.width = (((curQ+1)/total)*100) + '%';
+  updateDots();
+  var optsEl = document.getElementById('opts');
+  optsEl.innerHTML = '';
+  q.options.forEach(function(opt, i){
+    var btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.disabled = ua !== null;
+    var text = opt.replace(/^[A-D]\)\s*/,'');
+    btn.innerHTML = '<span class="letter">' + L[i] + '</span><span>' + text + '</span>';
+    if (ua !== null) {
+      if (i === q.answer) btn.classList.add('correct');
+      else if (i === ua) btn.classList.add('wrong');
+    }
+    btn.addEventListener('click', function(){ pick(i); });
+    optsEl.appendChild(btn);
+  });
+  var exp = document.getElementById('exp-box');
+  if (ua !== null) {
+    exp.style.display = 'block';
+    if (ua === q.answer) {
+      exp.className = 'exp-box correct';
+      exp.innerHTML = "<strong>To'g'ri!</strong> " + q.explanation;
+    } else {
+      var ct = q.options[q.answer].replace(/^[A-D]\)\s*/,'');
+      exp.className = 'exp-box wrong';
+      exp.innerHTML = "<strong>Noto'g'ri.</strong> To'g'ri javob: <strong>" + L[q.answer] + ")</strong> " + ct + ".<br><br>" + q.explanation;
+    }
+  } else exp.style.display = 'none';
+  document.getElementById('prev-btn').disabled = curQ === 0;
+  var nextBtn = document.getElementById('next-btn');
+  if (curQ === total-1) {
+    nextBtn.innerHTML = "Natijani ko'rish";
+    nextBtn.disabled = ua === null;
+    nextBtn.onclick = showResults;
+  } else {
+    nextBtn.innerHTML = "Keyingi <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' width='16' height='16'><polyline points='9 18 15 12 9 6'/></svg>";
+    nextBtn.disabled = ua === null;
+    nextBtn.onclick = nextQ;
+  }
+}
+
+function pick(i) { if (answers[curQ] !== null) return; answers[curQ] = i; renderQ(); }
+function prevQ() { if (curQ > 0) { curQ--; renderQ(); } }
+function nextQ() { if (curQ < questions.length-1) { curQ++; renderQ(); } }
+
+function showResults() {
+  var correct = answers.filter(function(a,i){ return a === questions[i].answer; }).length;
+  var total = questions.length;
+  var pct = Math.round((correct/total)*100);
+  document.getElementById('res-score').textContent = correct;
+  document.getElementById('res-denom').textContent = '/ ' + total;
+  document.getElementById('st-correct').textContent = correct;
+  document.getElementById('st-wrong').textContent = total-correct;
+  document.getElementById('st-pct').textContent = pct + '%';
+  var grade = pct>=86?'Ajoyib!':pct>=71?'Yaxshi!':pct>=56?'Qoniqarli':"Ko'proq mashq kerak";
+  document.getElementById('res-grade').textContent = grade;
+  document.getElementById('res-pct').textContent = correct + " ta to'g'ri · " + pct + '% ball';
+  var circ = 2*Math.PI*46;
+  var ring = document.getElementById('ring-fill');
+  ring.style.strokeDasharray = circ;
+  ring.style.strokeDashoffset = circ;
+  setTimeout(function(){ ring.style.strokeDashoffset = circ-(pct/100)*circ; }, 100);
+
+  // weak topics hint
+  var weakBox = document.getElementById('weak-box');
+  var wrongQs = [];
+  questions.forEach(function(q,i){ if (answers[i] !== q.answer) wrongQs.push(i+1); });
+  if (wrongQs.length > 0 && wrongQs.length <= total) {
+    document.getElementById('weak-text').textContent = wrongQs.length + " ta savolda xato qildingiz (" + wrongQs.join(', ') + "-savollar). Quyidagi tahlilni o'qib, \"Qayta o'rganish\" tugmasi bilan mavzuni takrorlang.";
+    weakBox.style.display = wrongQs.length ? 'block' : 'none';
+  } else weakBox.style.display = 'none';
+
+  var revList = document.getElementById('rev-list');
+  revList.innerHTML = '';
+  var L = ['A','B','C','D'];
+  questions.forEach(function(q,i){
+    var ua = answers[i]; var ok = ua===q.answer;
+    var div = document.createElement('div');
+    div.className = 'rv-item '+(ok?'rv-ok':'rv-err');
+    var ansText = ok ? "&#10003; To'g'ri: "+L[q.answer]+')' : '&#10007; Siz: '+(ua!==null?L[ua]+')':'—')+" &rarr; To'g'ri: "+L[q.answer]+')';
+    div.innerHTML = '<div class="rv-q">'+(i+1)+'. '+q.q+'</div><div class="rv-ans">'+ansText+'</div><div class="rv-exp">'+q.explanation+'</div>';
+    revList.appendChild(div);
+  });
+  show('result-screen');
+}
+
+function retake() {
+  // regenerate fresh questions for variety
+  topics[curTopic].questions = null;
+  testTopic(curTopic);
+}
+
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 4000);
+}
+</script>
+</body>
+</html>
